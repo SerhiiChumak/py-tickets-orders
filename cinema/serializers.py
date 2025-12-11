@@ -25,6 +25,8 @@ class ActorSerializer(serializers.ModelSerializer):
 
 
 class CinemaHallSerializer(serializers.ModelSerializer):
+    capacity = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = CinemaHall
         fields = ("id", "name", "rows", "seats_in_row", "capacity")
@@ -98,10 +100,8 @@ class MovieSessionDetailSerializer(MovieSessionSerializer):
         )
 
     def get_taken_places(self, obj):
-        return [
-            {"row": ticket.row, "seat": ticket.seat}
-            for ticket in obj.tickets.all()
-        ]
+        tickets = Ticket.objects.filter(movie_session=obj)
+        return [{"row": t.row, "seat": t.seat} for t in tickets]
 
 
 class TicketSerializer(serializers.ModelSerializer):
